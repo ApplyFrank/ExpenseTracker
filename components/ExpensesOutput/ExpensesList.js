@@ -3,7 +3,6 @@ import ExpenseItem from "./ExpenseItem";
 
 // Adjusted to directly receive the item
 function renderExpenseItem(item) {
-  console.log(item);
   return <ExpenseItem {...item} />;
 }
 

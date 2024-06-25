@@ -1,8 +1,8 @@
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { getFormatedDate } from "../../utils/date";
 
 function ExpenseItem({ description, amount, date }) {
-  console.log(description);
   return (
     <Pressable>
       <View style={styles.expenseItem}>
@@ -11,10 +11,10 @@ function ExpenseItem({ description, amount, date }) {
             {description}
           </Text>
           {/* Objects are not valid as a react child NOTE cuz date can't be displayed, need date.toString */}
-          <Text style={styles.textBase}>{date.toString()}</Text>
+          <Text style={styles.textBase}>{getFormatedDate(date)}</Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text>{amount}</Text>
+          <Text>{amount.toFixed(2)}</Text>
         </View>
       </View>
     </Pressable>
@@ -56,5 +56,6 @@ const styles = StyleSheet.create({
   amount: {
     color: GlobalStyles.colors.primary500,
     fontWeight: "bold",
+    minWidth: 80,
   },
 });
