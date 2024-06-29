@@ -17,7 +17,7 @@ const BottomTabs = createBottomTabNavigator();
 function ExpensesOverview() {
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <BottomTabs.Navigator
         screenOptions={({ navigation }) => ({
           headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
