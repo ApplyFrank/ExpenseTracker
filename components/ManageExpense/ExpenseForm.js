@@ -3,7 +3,7 @@ import { useState } from "react";
 import Input from "./Input";
 import Button from "../UI/Button";
 
-function ExpenseForm({ submitLabel, onCancel }) {
+function ExpenseForm({ submitLabel, onCancel, onSubmit }) {
   // NOTE instead of using 3 useState, we can use useState with an object.
   // then using JS syntax to set the key [inputIdentifier]: enteredValue
   const [inputValues, setInputValues] = useState({
@@ -23,7 +23,14 @@ function ExpenseForm({ submitLabel, onCancel }) {
     });
   }
 
-  function submitHandler() {}
+  function submitHandler() {
+    const expenseData = {
+      amount: +inputValues.amount,
+      date: new Date(inputValues.date),
+      description: inputValues.description,
+    };
+    onSubmit(expenseData);
+  }
   return (
     <>
       <View style={styles.form}>
