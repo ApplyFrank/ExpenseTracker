@@ -2,14 +2,15 @@ import { View, StyleSheet, Text } from "react-native";
 import { useState } from "react";
 import Input from "./Input";
 import Button from "../UI/Button";
+import { getFormatedDate } from "../../utils/date";
 
-function ExpenseForm({ submitLabel, onCancel, onSubmit }) {
+function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
   // NOTE instead of using 3 useState, we can use useState with an object.
   // then using JS syntax to set the key [inputIdentifier]: enteredValue
   const [inputValues, setInputValues] = useState({
-    amount: "",
-    date: "",
-    description: "",
+    amount: defaultExpense ? defaultExpense.amount.toString() : "",
+    date: defaultExpense ? getFormatedDate(defaultExpense.date) : "",
+    description: defaultExpense ? defaultExpense.description : "",
   });
 
   // when using .bind this is passed in as a first, then the second param is the first param in the function signature ie. inputIdentifier
