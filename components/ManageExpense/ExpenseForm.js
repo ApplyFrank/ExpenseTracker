@@ -7,18 +7,27 @@ import { getFormatedDate } from "../../utils/date";
 function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
   // NOTE instead of using 3 useState, we can use useState with an object.
   // then using JS syntax to set the key [inputIdentifier]: enteredValue
-  const [inputValues, setInputValues] = useState({
-    amount: defaultExpense ? defaultExpense.amount.toString() : "",
-    date: defaultExpense ? getFormatedDate(defaultExpense.date) : "",
-    description: defaultExpense ? defaultExpense.description : "",
+  const [input, setInput] = useState({
+    amount: {
+      value: defaultExpense ? defaultExpense.amount.toString() : "",
+      isValid: true,
+    },
+    date: {
+      value: defaultExpense ? getFormatedDate(defaultExpense.date) : "",
+      isValid: true,
+    },
+    description: {
+      value: defaultExpense ? defaultExpense.description : "",
+      isValid: true,
+    },
   });
 
   // when using .bind this is passed in as a first, then the second param is the first param in the function signature ie. inputIdentifier
   // enteredValue is automatically pass in thru reactNative
   function inputChangedHandler(inputIdentifier, enteredValue) {
-    setInputValues((curInputValues) => {
+    setInput((curInput) => {
       return {
-        ...curInputValues,
+        ...curInput,
         [inputIdentifier]: enteredValue,
       };
     });
@@ -26,9 +35,9 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
 
   function submitHandler() {
     const expenseData = {
-      amount: +inputValues.amount,
-      date: new Date(inputValues.date),
-      description: inputValues.description,
+      amount: +input.amount.value,
+      date: new Date(input.date.value),
+      description: input.description.value,
     };
 
     const isAmountValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
@@ -36,12 +45,21 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
     const isDescriptionValid = expenseData.description.trim().length > 0;
 
     if (!isAmountValid || !isDateValid || !isDescriptionValid) {
-      Alert.alert("Invalid input", "Please check your input values");
+      setInput({
+        amount: { value: expenseData.amount, isValid: isAmountValid },
+        date: { value: expenseData.date, isValid: isDateValid },
+        description: {
+          value: expenseData.description,
+          isValid: isDescriptionValid,
+        },
+      });
       return;
     }
 
     onSubmit(expenseData);
   }
+  const isFormValid =
+    input.amount.isValid && input.date.isValid && input.description.isValid;
   return (
     <>
       <View style={styles.form}>
@@ -54,7 +72,7 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
               keyboardType: "decimal-pad",
               // reconfigure a function for future execution using .bind
               onChangeText: inputChangedHandler.bind(this, "amount"),
-              value: inputValues.amount,
+              value: input.amount.value,
             }}
           />
           <Input
@@ -64,7 +82,7 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
               placeholder: "YYYY-MM-DD",
               maxLength: 10,
               onChangeText: inputChangedHandler.bind(this, "date"),
-              value: inputValues.date,
+              value: input.date.value,
             }}
           />
         </View>
@@ -75,10 +93,11 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
             //autoCapitalize: "none",
             //autoCorrect: false
             onChangeText: inputChangedHandler.bind(this, "description"),
-            value: inputValues.description,
+            value: input.description.value,
           }}
         />
       </View>
+      {!isFormValid && <Text>YOUR FORM HAS INVALID BRUH</Text>}
       <View style={styles.buttons}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
           Cancel
