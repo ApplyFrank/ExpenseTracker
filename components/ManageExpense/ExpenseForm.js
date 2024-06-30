@@ -1,8 +1,26 @@
 import { View, StyleSheet, Text } from "react-native";
+import { useState } from "react";
 import Input from "./Input";
 
 function ExpenseForm() {
-  function amountChangedHandler() {}
+  // NOTE instead of using 3 useState, we can use useState with an object.
+  // then using JS syntax to set the key [inputIdentifier]: enteredValue
+  const [inputValues, setInputValues] = useState({
+    amount: "",
+    date: "",
+    description: "",
+  });
+
+  // when using .bind this is passed in as a first, then the second param is the first param in the function signature ie. inputIdentifier
+  // enteredValue is automatically pass in thru reactNative
+  function inputChangedHandler(inputIdentifier, enteredValue) {
+    setInputValues((curInputValues) => {
+      return {
+        ...curInputValues,
+        [inputIdentifier]: enteredValue,
+      };
+    });
+  }
   return (
     <View style={styles.form}>
       <Text style={styles.title}>Your Expense</Text>
@@ -12,7 +30,8 @@ function ExpenseForm() {
           label="Amount"
           textInputConfig={{
             keyboardType: "decimal-pad",
-            onChangeText: amountChangedHandler,
+            onChangeText: inputChangedHandler.bind(this, "amount"),
+            value: inputValues.amount,
           }}
         />
         <Input
@@ -21,7 +40,8 @@ function ExpenseForm() {
           textInputConfig={{
             placeholder: "YYYY-MM-DD",
             maxLength: 10,
-            onCHangeText: () => {},
+            onChangeText: inputChangedHandler.bind(this, "date"),
+            value: inputValues.date,
           }}
         />
       </View>
@@ -31,6 +51,8 @@ function ExpenseForm() {
           multiline: true,
           //autoCapitalize: "none",
           //autoCorrect: false
+          onChangeText: inputChangedHandler.bind(this, "description"),
+          value: inputValues.description,
         }}
       />
     </View>
