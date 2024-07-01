@@ -3,6 +3,7 @@ import { useState } from "react";
 import Input from "./Input";
 import Button from "../UI/Button";
 import { getFormatedDate } from "../../utils/date";
+import { GlobalStyles } from "../../constants/styles";
 
 function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
   // NOTE instead of using 3 useState, we can use useState with an object.
@@ -28,7 +29,7 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
     setInput((curInput) => {
       return {
         ...curInput,
-        [inputIdentifier]: enteredValue,
+        [inputIdentifier]: { value: enteredValue, isValid: true },
       };
     });
   }
@@ -45,21 +46,25 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
     const isDescriptionValid = expenseData.description.trim().length > 0;
 
     if (!isAmountValid || !isDateValid || !isDescriptionValid) {
-      setInput({
-        amount: { value: expenseData.amount, isValid: isAmountValid },
-        date: { value: expenseData.date, isValid: isDateValid },
-        description: {
-          value: expenseData.description,
-          isValid: isDescriptionValid,
-        },
+      // NOTE keep in mind you have to use the existing data curInputs instead
+      // of the data coming in 'expenseData'
+      setInput((curInputs) => {
+        return {
+          amount: { value: curInputs.amount.value, isValid: isAmountValid },
+          date: { value: curInputs.date.value, isValid: isDateValid },
+          description: {
+            value: curInputs.description.value,
+            isValid: isDescriptionValid,
+          },
+        };
       });
       return;
     }
 
     onSubmit(expenseData);
   }
-  const isFormValid =
-    input.amount.isValid && input.date.isValid && input.description.isValid;
+  const formIsInvalid =
+    !input.amount.isValid || !input.date.isValid || !input.description.isValid;
   return (
     <>
       <View style={styles.form}>
@@ -68,6 +73,7 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
           <Input
             style={styles.rowInput}
             label="Amount"
+            invalid={!input.amount.isValid}
             textInputConfig={{
               keyboardType: "decimal-pad",
               // reconfigure a function for future execution using .bind
@@ -78,6 +84,7 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
           <Input
             style={styles.rowInput}
             label="Date"
+            invalid={!input.date.isValid}
             textInputConfig={{
               placeholder: "YYYY-MM-DD",
               maxLength: 10,
@@ -88,6 +95,7 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
         </View>
         <Input
           label="Description"
+          invalid={!input.description.isValid}
           textInputConfig={{
             multiline: true,
             //autoCapitalize: "none",
@@ -97,7 +105,9 @@ function ExpenseForm({ submitLabel, onCancel, onSubmit, defaultExpense }) {
           }}
         />
       </View>
-      {!isFormValid && <Text>YOUR FORM HAS INVALID BRUH</Text>}
+      {formIsInvalid && (
+        <Text style={styles.errorText}>YOUR FORM HAS INVALID BRUH</Text>
+      )}
       <View style={styles.buttons}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
           Cancel
@@ -131,6 +141,11 @@ const styles = StyleSheet.create({
   },
   rowInput: {
     flex: 1,
+  },
+  errorText: {
+    textAlign: "center",
+    color: GlobalStyles.colors.error500,
+    margin: 8,
   },
   buttons: {
     flexDirection: "row",
