@@ -8,8 +8,10 @@ function RecentExpenses() {
   const expensesCtx = useContext(ExpensesContext);
 
   useEffect(() => {
+    console.log("run useEffect RecentExpenses");
     async function getExpenses() {
-      await fetchExpenses();
+      const expenses = await fetchExpenses();
+      expensesCtx.setExpenses(expenses);
     }
     getExpenses();
   }, []);
